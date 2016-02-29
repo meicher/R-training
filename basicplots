@@ -1,0 +1,139 @@
+#R statistics essential training
+#Lynda.com 
+#2/29/2016
+
+#creating bar charts for categorical variables-----------------------------------------
+
+?plot
+
+require('datasets')
+
+chickwts
+
+data(chickwts)
+
+#quickest method
+plot(chickwts$feed)
+
+#barplot offers more control but must prepare data: R doesn't create bar charts directly from
+#the categorical variables; instead, we must first create a table that has frequenceis for each level of variable
+feeds<- table(chickwts$feed)
+#summed as default
+
+#same, but can edit barplot:
+#order bars by descending order
+barplot(feeds[order(feeds,decreasing=TRUE)])
+
+#customize chart margins - these will apply to all future plots - parameters
+par(oma =c(1,1,1,1)) #set outside margins: b,l,t,r
+
+par(mar=c(4,5,2,1)) #set plot margins
+
+#so pretty
+barplot(feeds[order(feeds)],
+        horiz=TRUE,
+        las= 1, # las 1 gives orientation of axis labels
+        col = c('beige','blanchedalmond','bisque1','bisque2','bisque3','bisque4'),
+        border= NA,
+        main = 'Frequencies of Different Feeds\nin chickwts dataset',
+        xlab = 'Number of Chicks')
+
+?colors
+
+#way to clean environment
+rm(list=ls())
+#CREATING HISTOGRAMS FOR QUANT VARIABLES-------------------------------
+
+data(lynx)
+
+hist(lynx)
+
+h<- hist(lynx,
+         breaks=11, #suggests 11 bins
+         #breaks = seq(0,7000,by=100)
+         #breaks = c(0,100,300,500,3000,3500,7000)
+         freq = FALSE, #remove frequency in order to use density normal curve
+         col='thistle1',
+         main='Histogram of Annual Canadian Lynx Trappings\n1821-1934',
+         xlab='Number of Lynx Trapped')
+
+#add normal dist curve for same mean/sd - density normal (dnorm)
+curve(dnorm(x,mean=mean(lynx),sd=sd(lynx)),
+      col='thistle4',
+      lwd=2,
+      add=TRUE) #adds to existing chart
+
+
+#CREATING BOXPLOTS FOR QUANT VARIABLES--------------------------------
+
+#good for checking for outliers, symmetry
+
+?USJudgeRatings
+
+#default
+boxplot(USJudgeRatings$RTEN)
+
+#since dataset is on same scale, can run whole dataframe-- show boxplot
+boxplot(USJudgeRatings,
+        horizontal=TRUE,
+        las=1,
+        notch=TRUE, #conf interval for median
+        ylim =c(0,10),
+        col='slategray3',
+        boxwex=.5, #width of box
+        whisklty=1,#whisker line type
+        xlab="Lawyers' Ratings")
+
+
+#Overlaying Plots --------------------------------------------------------------
+
+str(swiss)
+fert<- swiss$Fertility
+
+fert
+
+
+#plot1
+hist(fert,
+     prob=TRUE,   #make it a probability distribution so it represents proportions, useful if overlaying plots
+     ylim=c(0,.04),
+     xlim=c(30,100),
+     breaks=11,
+     col='#E5E5e5',
+     border=0,
+     main='Fertility for 47 French-Speaking\nSwiss Provinces, c. 1888')
+
+#plot2
+curve(dnorm(x,mean=mean(fert),sd=sd(fert)),
+      col='red',
+      lwd=3,
+      add=TRUE)
+
+#plot 3 & 4: Kernel density Lines (if prob =TRUE), sort of like a smoothed histogram almost like a moving avg
+lines(density(fert),col='blue')
+lines(density(fert,adjust=3),col='darkgreen')
+#adjust 3 spreads out how much it accounts for when it averages
+
+#plot5: Rug( that is, lineplot under histogram - adds data points to bottom)
+rug(fert,col='red')
+
+#challenge: layer plots for petal.length from iris dataset,--------------------------------------------
+#-histogram
+#-kernel density
+#-rug
+
+require('datasets')
+
+h<- hist(iris$Petal.Length,
+         prob=TRUE,
+         col='grey',
+         border=0)
+
+#make dist lines at different 'adjusts' or Moving average
+for(i in seq(1,10,.5)){
+  lines(density(iris$Petal.Length,adjust=i),col=rainbow(50)[i])
+}
+lines(density(iris$Petal.Length),col='black')
+lines(density(iris$Petal.Length,adjust=3),lwd=2,col='yellow') #adjust is default at 1
+rug(iris$Petal.Length,col='blue')
+
