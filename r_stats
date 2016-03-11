@@ -1,0 +1,160 @@
+
+#Computing Robust Statistics for bivariate associations ----------------------
+
+install.packages('quantreg')
+library(quantreg)
+
+#will be doing quantile regression
+
+data(engel)
+
+attach(engel)
+#attach allows shortcut references to data set columns
+
+plot(income,
+     foodexp,
+     cex=.5)
+
+points(income,
+       foodexp,
+       pch=16,
+       col='lightgray')
+
+
+taus<- c(.05,.1,.25,.75,.9,.95)
+#quantiles
+
+xx<- seq(min(income),max(income),100) #X values
+f<- coef(rq((foodexp)~(income),tau=taus)) #coefficients
+yy<-cbind(1,xx)%*%f #y values
+
+for(i in 1:length(taus)){ # for each quantile value
+  lines(xx,yy[,i], col='darkgray')     #draw regression line
+}
+
+abline(lm(foodexp ~ income), #Standard LS regression
+       col='darkred',
+       lwd=1)
+
+abline(rq(foodexp ~ income),   #Median regression - much less affected by outlier
+       col= 'blue',
+       lwd =1)
+
+legend(3000,1000,
+       c('meanfit','medianfit'),
+       col= c('darkred','blue'),
+       lty=1,
+       lwd=2)
+
+detach(engel)
+
+
+x<- c(31,57)
+n<- c(72,96)
+
+prop.test(x,n)
+
+
+
+#CHAPTER 8: Charts for 3+ Variables #############
+
+#Creating clustered bar chart for frequencies #######################
+
+#load warpbreaks data
+str(warpbreaks)
+
+data<- tapply(warpbreaks$breaks,
+              list(warpbreaks$wool, warpbreaks$tension),mean)   
+#creates a 2x3 matrix 
+
+
+barplot(data,
+        beside=TRUE,
+        col=c('steelblue3','thistle3'),
+        bor=NA)
+
+
+# for legend, locator(1) is interactive and lets you click where you want to put the legend.
+#run this code and then click on plot to place legend.
+legend(locator(1),
+       rownames(data),
+       fill=c('steelblue3','thistle3'))
+
+
+#Creating scatterplots for grouped data ####################
+
+str(iris)
+install.packages('car')
+library(car)
+
+
+
+#single scatterplot with groups marked
+#fxn can be called with sp or scatterplot
+#chart width as a function of length, broken down by species#
+sp(Sepal.Width ~ Sepal.Length | Species,
+   data = iris,
+   main = 'Iris Data',
+   labels = row.names(iris))
+
+#good way to show x,y relationship for 3 different groups on THE SAME SCATTER PLOT
+
+
+
+
+#Creating a scatterplot Matrix #############################
+
+data(iris)
+str(iris)
+
+attach(iris)
+
+pairs(iris[1:4])
+#chart first 4 variables - these are the quantitative variables
+
+#Modified scatterplot matrices
+
+#create palette with RColorBrewer
+
+require('RColorBrewer')
+display.brewer.pal(3,'Pastel1')
+#displays colors which will be used
+
+
+#put histograms on the diangol (see 'pairs' for help)
+panel.hist<- function(x,...)
+{
+  usr<- par('usr');on.exit(par(usr))
+  par(usr = c(usr[1:2],0,1.5))
+  h<- hist(x,plot=FALSE)
+  breaks<- h$breaks;nB<- length(breaks)
+  y<- h$counts; y<- y/max(y)
+  rect(breaks[-nB],0,breaks[-1],y, ...)
+  #removed col = cyan from code block
+}
+
+pairs(iris[1:4],
+      panel= panel.smooth,
+      diag.panel = panel.hist,
+      pch=16,
+      col= brewer.pal(3,'Pastel1')[unclass(iris$Species)]) # this tells it to color according to the species
+#looks much better
+
+
+#similar with 'car' package
+#gives kernel density and rugplot for each variable
+
+library(car)
+scatterplotMatrix(~Petal.Length + Petal.Width + Sepal.Length + Sepal.Width | Species,
+                  data = iris,
+                  col = brewer.pal(3,'Dark2'))
+
+
+#CREATING 3d Scatterplots #########################
+
+#spinning 3d scatterplot
+#install and load rgl package
+#however this is not compatible with R studio.
+
+
+#CHAPTER 9: COMPUTING A MULTIPLE REGRESSION ######################
