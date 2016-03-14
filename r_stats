@@ -224,3 +224,56 @@ TukeyHSD(aov1)
 
 
 #CLUSTER ANALYSIS (KMEANS & HIERARCHICAL ANALYSES) ################
+
+data(mtcars)
+head(mtcars)
+
+mtcars1<- mtcars[,c(1:4,6:7,9:11)]
+#take a couple columns out
+
+#three major kinds of clustering:
+#   1- split into set number of clusters (kmeans)
+#   2- hierarchical: start separate and combine
+#   3- Dividing: start with single group and split
+
+#we'll use hierarchical method
+#Need distance matrix (dissimilarity Matrix)
+#   eg. based on all of the variables in the dataset, miles per gallon and so on, 
+#   you need to figure out how similar. Or how different each of the cars is from each of the cases. 
+
+d<- dist(mtcars)
+
+c<- hclust(d)
+# use distance matrix for clustering , hclust = hier clust
+
+plot(c)
+
+#put observations in groups
+#need to specify height = h or groups = k
+g3<- cutree(c,k=3)
+
+
+#or do several levels of groups at once
+#'gm' = 'groups/multiple'
+# shows which cluster each falls into, depending on k value
+gm<- cutree(c,k=2:5) 
+gm
+
+#draw boxes around clusters
+rect.hclust(c,k=3,border='tomato1')
+rect.hclust(c,k=4,border='yellow')
+
+
+#k-means clustering
+km<- kmeans(mtcars1,3)
+km
+
+require(cluster)
+
+clusplot(mtcars1,
+          km$cluster,
+          color=TRUE,
+          lines=3,
+          labels=2)
+
+
